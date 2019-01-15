@@ -1,6 +1,7 @@
 function showMusicToHTML(){
     document.querySelector('.list').innerHTML = bg.obj.folderList.map((o,i)=>`<li data-index="${i}"> ${bg.obj.defaultFolder === o.name?'<canvas width="20" height="16" class="play_ico"></canvas>':'<i></i>'}${o.name}<span>[共:${o.total}首]</span></li>`).join("")||`<li>无</li>`
     let c = document.querySelector('.play_ico')
+    if (!c) return
     ctx = c.getContext('2d')
     gradient = ctx.createLinearGradient(0, 0, 0, 14)
     gradient.addColorStop(0, '#ff6600')
@@ -96,4 +97,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     },false)
+    // 定时检测
+    let str = ''
+    setInterval(()=>{
+        let list = JSON.stringify(bg.obj.folderList)
+        if(str !== list){
+            str = list
+            showMusicToHTML()
+        }
+    },1000)
 })

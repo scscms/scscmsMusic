@@ -20,20 +20,6 @@ function drawLine(x, y, X, Y, color) {
     ctx.strokeStyle = color
     ctx.stroke()
 }
-// 截取歌曲名
-function getNameByteLen() {
-    let name = bg.obj.songName
-    let len = 30
-    let str = ''
-    for (let i = 0; i < name.length; i++) {
-        len -= /[^\x00-\xff]/.test(name[i]) ? 2 : 1
-        if(len < 0){
-            str = name.slice(0,i)
-            break
-        }
-    }
-    return len < 0 ? str : name
-}
 function getSongTime() {
     const f = v => parseInt(v).toString().padStart(2, '0')
     let t = bg.source.context.currentTime
@@ -42,9 +28,7 @@ function getSongTime() {
 }
 
 function draw() {
-    bg = chrome.extension.getBackgroundPage()
-    obj = bg.obj
-    if(!obj.init){
+    if(!obj.init || !obj.analyser){
         ctx.clearRect(0, 0, 400, 200) // 清空画布
         ctx.font = '18px sans-serif'
         ctx.fillStyle = '#006600'
@@ -60,7 +44,7 @@ function draw() {
     ctx.align = 'right'
     if(obj.context.state === 'running'){
         ctx.clearRect(0, 0, 400, 200)
-        ctx.fillText(getNameByteLen(), 220, 14, 170) //歌名
+        ctx.fillText(bg.obj.songName, 220, 14, 170) //歌名
         for (let i = freq.length; i--;) {
             cap[i] = freq[i * 10] < cap[i] ? cap[i] - 1 : freq[i * 10]
             ctx.fillStyle = '#fff'
@@ -106,10 +90,11 @@ function draw() {
 }
 let bg,obj,ctx,img,list,gradient // 是否已经在绘画
 window.onload = function () {
+    bg = chrome.extension.getBackgroundPage()
+    obj = bg.obj
     let input = document.querySelector('input')
     list = document.querySelector('.list')
     list.addEventListener('click', (e) => {
-        console.log(e)
         let tag = e.target
         if(tag.tagName==='LI'){
             obj.manual = 'clickLI'
@@ -149,14 +134,18 @@ window.onload = function () {
         let action
         if (y > 175 && y < 175 + 18) {
             if (x > 14 && x < 14 + 18) {
-                action = 'prior' // 上一首
-                obj.downPrior = true
+                if(obj.index > 0){
+                    action = 'prior' // 上一首
+                    obj.downPrior = true
+                }
             } else if (x > 14 + 18 + 10 && x < 14 + 18 + 10 + 18) {
                 action = 'playing' // 播放｜停止
                 obj.downPlay = obj.downStop = true
             } else if (x > 14 + (18 + 10) * 2 && x < 14 + (18 + 10) * 2 + 18) {
-                action = 'next' // 下一首
-                obj.downNext = true
+                if(obj.index < obj.totalSongs - 1){
+                    action = 'next' // 下一首
+                    obj.downNext = true
+                }
             } else if (x > 14 + (18 + 10) * 3 && x < 14 + (18 + 10) * 3 + 18) {
                 action = 'serial' // 循环
             } else if (x > 14 + (18 + 10) * 4 && x < 14 + (18 + 10) * 4 + 18) {

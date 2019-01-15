@@ -112,11 +112,11 @@ var fileSystem = {
                 let dirReader = dirEntry.createReader()
                 dirReader.readEntries(function (results) {
                     let count = 0
-                    obj.folderList = []
+                    var lists = []
                     results.forEach(o => {
                         fileSystem.listFiles(o.name).then(arr=>{
                             if(o.name === obj.defaultFolder){
-                                obj.folderList.push({name: o.name, total: arr.length, musics: arr})
+                                lists.push({name: o.name, total: arr.length, musics: arr})
                                 obj.totalSongs = arr.length // 总共多少首歌曲
                                 arr.forEach((song, index)=>{
                                     if(song.name === obj.songName){
@@ -134,16 +134,32 @@ var fileSystem = {
                                     })
                                 })
                             }else{
-                                obj.folderList.push({name: o.name, total: arr.length})
+                                lists.push({name: o.name, total: arr.length})
                             }
                         }).finally(()=>{
-                            ++count === results.length && resolve()
+                            if(++count === results.length){
+                                obj.folderList = lists
+                                resolve()
+                            }
                         })
                     })
                 }, e => reject(e.name))
             })
         })
     }
+}
+// 截取歌曲名
+function getNameByteLen(name) {
+    let len = 30
+    let str = ''
+    for (let i = 0; i < name.length; i++) {
+        len -= /[^\x00-\xff]/.test(name[i]) ? 2 : 1
+        if(len < 0){
+            str = name.slice(0,i)
+            break
+        }
+    }
+    return len < 0 ? str : name
 }
 var obj = {
     context: new AudioContext(),
@@ -238,8 +254,8 @@ function playSong(step,index){
     }else if(pat === 'ordinal'){
         if (obj.index > maxLength - 1 || obj.index < 0) {
             obj.init = false
-            obj.index = _index
-            obj.context.suspend()
+            obj.index = 0
+            obj.context.suspend() // 为了出现播放菜单
             setTimeout(updatePlayMenus,100)
             return
         }
@@ -247,7 +263,7 @@ function playSong(step,index){
         obj.index = Math.floor(Math.random() * maxLength)
     }
     let music = musics[obj.index]
-    obj.songName = music.name // 更新当前歌名
+    obj.songName = getNameByteLen(music.name)  // 更新当前歌名
     obj.init = true
     fileSystem.readerFile(music.fullPath).then(b=>{
         obj.manual = null

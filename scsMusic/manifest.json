@@ -16,16 +16,17 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["http://www.scscms.com/*"],
       "js": ["js/content-script.js"],
       "run_at": "document_start"
     }
   ],
   "permissions":  [
-    "contextMenus", // 右键菜单
-    "notifications", // 通知
-    "webRequest","http://music.taihe.com/*", // web请求
-    "storage" // 插件本地存储
+    "http://www.scscms.com/*",
+    "contextMenus",
+    "notifications",
+    "webRequest",
+    "storage"
   ],
   "web_accessible_resources": [],
   "homepage_url": "https://github.com/scscms/",
