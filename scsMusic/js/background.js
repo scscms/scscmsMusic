@@ -301,6 +301,7 @@ function playSong(step,index){
 }
 // 新增音乐
 function addingMusic(arr, isLocal){
+    console.log(arr,isLocal)
     let reg = /^https?:\/\/.+\.(mp3|ogg|m4a)(\?.+)?/i
     let lists = getCurrentMusicList()
     arr.forEach(item => {
@@ -318,9 +319,9 @@ function addingMusic(arr, isLocal){
         }else{
             fetch(item).then(res => res.blob().then(blob => {
                 let reg = /^audio\/(mp3|ogg|mp4|mpeg)$/i
-                reg.test(blob.type) && blob.size > 1048576 ? saveMusicToList(name, blob):sendNotice('音乐文件下载失败', blob.toString())
-            })).catch(()=>{
-                sendNotice('音乐文件下载失败', item)
+                reg.test(blob.type) && blob.size > 1048576 ? saveMusicToList(name, blob):sendNotice('音乐文件格式或大小不符合', blob.toString())
+            })).catch(e=>{
+                sendNotice('音乐文件下载失败', e.message + item)
             })
         }
     })
@@ -363,7 +364,7 @@ if (W.requestFileSystem) {
 function sendNotice(title,message,fun){
     chrome.notifications.create(null, {
         type: 'basic',
-        iconUrl: 'img/icons.png',
+        iconUrl: 'img/icons128.png',
         title,
         message,
     },function(id){
@@ -414,9 +415,7 @@ function operation(action, val) {
 }
 
 // 监听来自content-script的消息
-let noticeId
-let ajaxSong
-let menuId
+let noticeId, ajaxSong, menuId
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     let type = request.type
     let data = request.data

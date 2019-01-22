@@ -116,7 +116,11 @@ window.onload = function () {
        input.click()
     }, false)
     input.addEventListener('change', e => {
-        bg.addingMusic(Array.from(e.target.files), true)
+        let arr = Array.from(e.target.files)
+        let time = 0　// 一次添加过多歌曲会导致崩溃
+        while(arr.length){
+            setTimeout(bg.addingMusic,6000 * time++ ,arr.splice(0,2),true)
+        }
     }, false)
     let canvas = document.querySelector('canvas')
     let div = document.querySelector('div')

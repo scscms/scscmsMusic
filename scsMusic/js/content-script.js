@@ -2,7 +2,6 @@
 function sendMsgToBackground(type,data) {
     chrome.runtime.sendMessage({type, data})
 }
-
 // 检查歌曲
 let hasInform = false
 let songArray = []

@@ -1,29 +1,38 @@
 {
   "manifest_version": 2,
+  "version": "1.0.2",
   "name": "SCSCMS音乐播放器",
-  "version": "1.0.1",
-  "description": "这是一个chrome扩展程序的音乐播放器，方便在没有安装音乐播放器时使用chrome浏览器听歌。可以建立播放列表，导入的歌曲可以存储，并支持播放远程音乐。github.com/scscms/scsMusic",
-  "icons":  {
-    "128": "img/icons.png"
+  "short_name": "scsMusic",
+  "description": "这是一个chrome扩展程序的音乐播放器，方便在没有安装音乐软件时使用chrome浏览器听歌。可以建立播放列表，导入的歌曲可以存储，并支持播放远程音乐。github.com/scscms/scsMusic",
+  "icons": {
+    "128": "img/icons128.png",
+    "48": "img/icons128.png",
+    "16": "img/icons16.png"
   },
-  "key":"MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwQkx5ZaEIbFbWIcR8Qt5q25GzIIerFmYtsoaU1hSXx/fWR6A9t9WoGRpYt6KXdDLxKi7YW+qsQEJlu/aHzvk8m+Gg6DoAfhIwQU9UCDfxaal9K6Y9JFZENXVwiCV3pNiespVbiDd1PKskiAFvuP+mlO6sLkPux2vsy2ODxCDUlNsm4GktoIADlvGFpICxhmaZE8hhqyq3afpLsqhAS1k01u4sIuREB/AJnJ28/2qmYK333/prDcZ2/1lY/ZtcQBsEjXgcoSxSm9ibs2pMB9mNyKgcbVQQsinqHNzSQNfDb6kvXurkMcul56tXE+F3sYk/pNpbjhoEtX1hXAfoJkuoQIDAQAB",
-  "background":  {
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwQkx5ZaEIbFbWIcR8Qt5q25GzIIerFmYtsoaU1hSXx/fWR6A9t9WoGRpYt6KXdDLxKi7YW+qsQEJlu/aHzvk8m+Gg6DoAfhIwQU9UCDfxaal9K6Y9JFZENXVwiCV3pNiespVbiDd1PKskiAFvuP+mlO6sLkPux2vsy2ODxCDUlNsm4GktoIADlvGFpICxhmaZE8hhqyq3afpLsqhAS1k01u4sIuREB/AJnJ28/2qmYK333/prDcZ2/1lY/ZtcQBsEjXgcoSxSm9ibs2pMB9mNyKgcbVQQsinqHNzSQNfDb6kvXurkMcul56tXE+F3sYk/pNpbjhoEtX1hXAfoJkuoQIDAQAB",
+  "offline_enabled": true,
+  "background": {
     "page": "background.html"
   },
-  "browser_action":  {
-    "default_icon": "img/icons.png",
-    "default_title": "scscms 网页播放器",
+  "browser_action": {
+    "default_icon": "img/icons16.png",
+    "default_title": "SCSCMS音乐播放器",
     "default_popup": "popup.html"
   },
   "content_scripts": [
     {
-      "matches": ["http://www.scscms.com/*"],
-      "js": ["js/content-script.js"],
+      "matches": [
+        "http://www.scscms.com/*"
+      ],
+      "all_frames": true,
+      "js": [
+        "js/content-script.js"
+      ],
       "run_at": "document_start"
     }
   ],
-  "permissions":  [
-    "http://www.scscms.com/*",
+  "permissions": [
+    "activeTab",
     "contextMenus",
     "notifications",
     "webRequest",
@@ -31,7 +40,7 @@
   ],
   "web_accessible_resources": [],
   "homepage_url": "https://github.com/scscms/",
-  "options_ui":  {
+  "options_ui": {
     "page": "options.html",
     "chrome_style": true
   }

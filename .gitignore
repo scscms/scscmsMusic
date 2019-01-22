@@ -7,6 +7,7 @@ package-lock.json
 npm-debug.log
 scsMusic.crx
 scsMusic.pem
+scsMusic/scsMusic.zip
 
 # Editor directories and files
 .idea
