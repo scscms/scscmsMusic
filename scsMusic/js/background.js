@@ -370,11 +370,11 @@ function operation(action, val) {
     switch (action) {
         case 'remove':
             let index = obj.index
-            let path = getCurrentMusicList()[val].fullPath
-            fileSystem.delFile(path).then(() => {
+            let list = getCurrentMusicList()
+            fileSystem.delFile(list[val].fullPath).then(() => {
                 fileSystem.updateMusicList().then(()=>{
                     if (val === index) {
-                        playSong(0,index)
+                        playSong(0, index === list.length - 1 ? 0 : index)
                     }
                 })
             })
