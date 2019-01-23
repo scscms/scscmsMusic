@@ -122,16 +122,6 @@ var fileSystem = {
                                     if(song.name === obj.songName){
                                         obj.index = index // 修正index
                                     }
-                                    fileSystem.readerFile(song.fullPath).then(b=>{
-                                        new AudioContext().decodeAudioData(b).then(buffer => {
-                                            let duration = parseInt(buffer.duration)
-                                            let pad = t => parseInt(t).toString().padStart(2, '0')
-                                            song.duration = duration
-                                            song.time = `[${pad(duration / 60)}:${pad(duration % 60)}]`
-                                        }).catch(function(){
-                                            song.bad = true
-                                        })
-                                    })
                                 })
                             }else{
                                 lists.push({name: o.name, total: arr.length})
@@ -269,6 +259,10 @@ function playSong(step,index){
         obj.manual = null
         updatePlayMenus()
         obj.context.decodeAudioData(b).then(buffer => {
+            let duration = parseInt(buffer.duration)
+            let pad = t => parseInt(t).toString().padStart(2, '0')
+            music.duration = duration
+            music.time = `[${pad(duration / 60)}:${pad(duration % 60)}]`
             source.stop && source.stop(0)
             obj.context = new AudioContext() // 新建对象，否则播放时间不对
             source = obj.context.createBufferSource()
@@ -301,7 +295,6 @@ function playSong(step,index){
 }
 // 新增音乐
 function addingMusic(arr, isLocal){
-    console.log(arr,isLocal)
     let reg = /^https?:\/\/.+\.(mp3|ogg|m4a)(\?.+)?/i
     let lists = getCurrentMusicList()
     arr.forEach(item => {

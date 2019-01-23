@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "name": "SCSCMS音乐播放器",
   "short_name": "scsMusic",
   "description": "这是一个chrome扩展程序的音乐播放器，方便在没有安装音乐软件时使用chrome浏览器听歌。可以建立播放列表，导入的歌曲可以存储，并支持播放远程音乐。github.com/scscms/scsMusic",

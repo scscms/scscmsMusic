@@ -14,9 +14,17 @@
 ### 特别说明：
 
  - 以开发者安装的扩展，每次启动浏览器都会提示`“请信用以开发者模式运行的扩展程序”`可忽略并关闭。在谷歌商店上安装不存在此问题。
- - 因数组有限，播放时间长的音乐会导致扩展程序崩溃。
- - 一次性添加过多歌曲，写入文件时也可能会导致扩展程序崩溃。
+ - 因数组资源有限，播放时间长的音乐会导致扩展程序崩溃。
+ - 添加网络歌曲失败原因：权限问题，因扩展程序申请过泛的权限需要谷歌严格审核，为了不影响发布进程，所以权限做了减缩。恢复方法：
 
+	1、在`chrome浏览器`里打开`chrome://extensions/`
+
+	2、记下`SCSCMS音乐播放器`程序的ID
+
+	3、打开`chrome扩展程序`目录`C:\Users\用户名\AppData\Local\Google\Chrome\User Data\Default\Extensions\ID`（这里以win7为例，其他系统请自行百度）
+
+	4、打开`manifest.json`添加　"permissions": [ `"http://*/*", "https://*/*"`,　并把"matches": [ `"http://www.scscms.com/*"` ],改为"matches": [ `"<all_urls>"` ],　搞定。
+ 
 ### 程序图片:
 
 ![](pictrue/1.png)
