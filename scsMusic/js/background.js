@@ -228,6 +228,7 @@ function playSong(step,index){
         }else{
             playSong(0,0)
         }
+        obj.manual = null
         return
     }
     source.stop && source.stop(0)
