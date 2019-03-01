@@ -191,7 +191,7 @@ function startInitialize() {
             // 判断默认文件夹是否存在
             let lists = obj.folderList
             if (lists.find(o => o.name === obj.defaultFolder)) {
-                obj.autoPlay && playSong(0, 0)
+                obj.autoPlay && playSong(0)
             } else {
                 // 默认文件夹不存在
                 if (lists.length === 0) {
@@ -216,6 +216,7 @@ function playSong(step,index){
     let maxLength = musics.length
     if(maxLength === 0){
         obj.init = false
+        obj.context.suspend()
         source.stop && source.stop(0)
         return sendNotice('播放器通知','暂无音乐请先添加音乐文件！')
     }
@@ -223,43 +224,35 @@ function playSong(step,index){
         // 直接点击播放或者暂停
         if(obj.init){
             obj.context.state === 'running' ? obj.context.suspend() : obj.context.resume()
-            obj.downPlay = obj.downStop = false
             setTimeout(updatePlayMenus,100)
         }else{
-            playSong(0,0)
+            playSong(0)
         }
         obj.manual = null
         return
     }
     source.stop && source.stop(0)
     let pat = obj.pattern[obj.serial]
-    let _index = obj.index // 备份
-    obj.index += step
+    if (!obj.init) obj.index = 0
     if(Number.isInteger(index)){
         obj.index = index
-    }else if(pat === 'single'){
-        obj.index = _index // 单曲循环
-    }else if(pat === 'loop'){
-        obj.index >= maxLength && (obj.index = 0)
-        obj.index < 0 && (obj.index = maxLength - 1)
-    }else if(pat === 'ordinal'){
-        if (obj.index > maxLength - 1 || obj.index < 0) {
-            obj.init = false
-            obj.index = 0
-            obj.context.suspend() // 为了出现播放菜单
-            setTimeout(updatePlayMenus,100)
-            return
+    }else{
+        obj.index += step
+        if(pat === 'random'){
+            obj.index = Math.floor(Math.random() * maxLength)
         }
-    }else if(pat === 'random'){
-        obj.index = Math.floor(Math.random() * maxLength)
     }
+    console.log(pat,'index:',obj.index,obj.downNext,obj.downPrior)
+    obj.index >= maxLength && (obj.index = 0)
+    obj.index < 0 && (obj.index = maxLength - 1)
     let music = musics[obj.index]
     obj.songName = getNameByteLen(music.name)  // 更新当前歌名
     obj.init = true
+    obj.manual = 'ing'
     fileSystem.readerFile(music.fullPath).then(b=>{
-        obj.manual = null
-        updatePlayMenus()
         obj.context.decodeAudioData(b).then(buffer => {
+            obj.manual = null
+            updatePlayMenus()
             let duration = parseInt(buffer.duration)
             let pad = t => parseInt(t).toString().padStart(2, '0')
             music.duration = duration
@@ -277,9 +270,7 @@ function playSong(step,index){
             source.loopStart = source.context.currentTime + 20
             source.start(0)
             obj.songDuration = buffer.duration
-            source.onended = function (){
-                !obj.manual && playSong(1)// 手动点击上下一首，也会触发onended，所以要排除
-            }
+            source.onended = handlePlayOnEnded
             obj.frequencyArray = new Uint8Array(obj.analyser.frequencyBinCount)
         },()=>{
             sendNotice('播放音乐出错',`《${music.name}》音乐文件解码失败,已自动删除！`)
@@ -293,6 +284,27 @@ function playSong(step,index){
         obj.manual = 'self-next'
         playSong(1) // 自动播放下一首
     })
+}
+// 播放结束事件
+function handlePlayOnEnded(){
+    if(!obj.manual){
+        let pat = obj.pattern[obj.serial]
+        let musics = getCurrentMusicList()
+        let maxLength = musics.length
+        if(pat === 'ordinal' && obj.index === maxLength - 1){
+            obj.init = false
+            obj.index = 0
+            source.stop && source.stop(0)
+            obj.context.suspend() // 为了出现播放菜单
+            setTimeout(updatePlayMenus,100)
+        }else if(pat === 'random'){
+            playSong(0,Math.floor(Math.random() * maxLength))
+        }else if(pat === 'single'){
+            playSong(0,obj.index)
+        }else{
+            playSong(0, obj.index + 1)
+        }
+    }
 }
 // 新增音乐
 function addingMusic(arr, isLocal){
@@ -331,7 +343,7 @@ function saveMusicToList(name, data){
         mineType: type[suffix] || 'audio/midi'
     }).then(()=>{
         fileSystem.updateMusicList().then(()=>{
-            !obj.init && playSong(0,0)
+            !obj.init && playSong(0)
         })
     },e=>{
         sendNotice('音乐保存失败',`《${name}》因“${e}”加载失败！`)
@@ -367,6 +379,10 @@ function sendNotice(title,message,fun){
 }
 // 操作播放器
 function operation(action, val) {
+    if(obj.manual === 'ing') {
+        console.log('操作太快了！')
+        return // 避免不断操作bug
+    }
     obj.manual = action
     switch (action) {
         case 'remove':
@@ -381,7 +397,6 @@ function operation(action, val) {
             })
             break
         case 'prior':
-            obj.downPrior = false
             playSong(-1)
             break
         case 'playing':
@@ -389,7 +404,6 @@ function operation(action, val) {
             break
         case 'next':
             playSong(1)
-            obj.downNext = false
             break
         case 'serial':
             obj.serial = ++obj.serial % 4

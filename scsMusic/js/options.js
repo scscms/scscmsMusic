@@ -73,7 +73,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 bg.obj.manual = 'click li'
                 bg.fileSystem.updateMusicList().then(()=>{
                     showMusicToHTML()
-                    bg.playSong(0,0)
+                    bg.obj.index = 0
+                    bg.playSong(0)
                 })
                 bg.setStorage()
                 break

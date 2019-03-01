@@ -20,29 +20,27 @@ function drawLine(x, y, X, Y, color) {
     ctx.strokeStyle = color
     ctx.stroke()
 }
+
 function getSongTime() {
+    let time = '00:00/00:00'
+    if(!bg.obj.init)return time
     const f = v => parseInt(v).toString().padStart(2, '0')
-    let t = bg.source.context.currentTime
-    let d = bg.obj.songDuration
-    return `${f(t / 60)}:${f(t % 60)}/${f(d / 60)}:${f(d % 60)}`
+    try{
+        let c = bg.source.context
+        let t = c ? c.currentTime : 0
+        let d = bg.obj.songDuration
+        t = t > d ? d : t
+        time = `${f(t / 60)}:${f(t % 60)}/${f(d / 60)}:${f(d % 60)}`
+    }catch (e) {}
+    return time
 }
 
 function draw() {
-    if(!obj.init || !obj.analyser){
-        ctx.clearRect(0, 0, 400, 200) // 清空画布
-        ctx.font = '18px sans-serif'
-        ctx.fillStyle = '#006600'
-        ctx.align = 'center'
-        ctx.fillText('双击添加歌曲,右键播放列表', 90, 100)
-        requestAnimationFrame(draw)
-        return
-    }
     let cap = obj.capYArray
-    let freq = obj.frequencyArray
-    obj.analyser.getByteFrequencyData(freq)
-    ctx.font = '12px sans-serif' // 歌曲名称
     ctx.align = 'right'
-    if(obj.context.state === 'running'){
+    if(obj.analyser && obj.context.state === 'running'){
+        let freq = obj.frequencyArray
+        obj.analyser.getByteFrequencyData(freq)
         ctx.clearRect(0, 0, 400, 200)
         ctx.fillText(bg.obj.songName, 220, 14, 170) //歌名
         for (let i = freq.length; i--;) {
@@ -59,7 +57,15 @@ function draw() {
         ctx.fillRect(0, 165, Math.floor(bg.source.context.currentTime / bg.obj.songDuration * 400), 2)
     }else{
         ctx.clearRect(0, 167, 400, 200)
+        if(!obj.init){
+            ctx.clearRect(0, 0, 400, 200) // 清空画布
+            ctx.font = '18px sans-serif'
+            ctx.fillStyle = '#006600'
+            ctx.align = 'center'
+            ctx.fillText('双击添加歌曲,右键播放列表', 90, 90)
+        }
     }
+    ctx.font = '12px sans-serif' // 歌曲名称
     // 画控制台背景
     let clg = ctx.createLinearGradient(0, 168, 0, 200)
     clg.addColorStop(0, '#36342b')
@@ -69,11 +75,11 @@ function draw() {
     drawLine(0, 167.5, 400, 167.5, '#003300')
     drawLine(0, 168.5, 400, 168.5, '#51514a')
     let pattern = obj.pattern[obj.serial]
-    let y = obj.downPrior || (pattern === 'ordinal' && obj.index === 0) ? 0 : 18
+    let y = obj.downPrior || obj.totalSongs === 0 ? 0 : 18
     ctx.drawImage(img, 0, y, 18, 18, 14, 175, 18, 18) // 上一首
-    y = obj.context.state !== 'suspended' ? (obj.downStop ? 234 : 54) : (obj.downPlay ? 216 : 36)
+    y = obj.init && obj.context.state !== 'suspended' ? (obj.downStop ? 234 : 54) : (obj.totalSongs === 0 || obj.downPlay ? 216 : 36)
     ctx.drawImage(img, 0, y, 18, 18, 14 + 18 + 10, 175, 18, 18) // 播放｜停止
-    y = obj.downNext || (pattern === 'ordinal' && obj.index === obj.totalSongs - 1) ? 72 : 90
+    y = obj.downNext || obj.totalSongs === 0 ? 72 : 90
     ctx.drawImage(img, 0, y, 18, 18, 14 + (18 + 10) * 2, 175, 18, 18) // 下一首
     y = {loop: 108, single: 126, random: 144, ordinal: 162}[pattern]
     ctx.drawImage(img, 0, y, 18, 18, 14 + (18 + 10) * 3, 175, 18, 18) // 循环
@@ -112,8 +118,8 @@ window.onload = function () {
         list.innerHTML = html || '<li class="empty-list">暂无音乐，请双击添加</li>'
         list.style.display = 'block'
     }, false)
-    document.addEventListener('dblclick', () => {
-       input.click()
+    document.addEventListener('dblclick', (e) => {
+        e.pageY < 170 && input.click() // 避免点击按钮频繁误操作
     }, false)
     input.addEventListener('change', e => {
         bg.addingMusic(Array.from(e.target.files),true)
@@ -132,9 +138,11 @@ window.onload = function () {
         let x = e.pageX
         let y = e.pageY
         let action
+        let loop = obj.totalSongs > 0
         if (y > 175 && y < 175 + 18) {
             if (x > 14 && x < 14 + 18) {
-                if(obj.index > 0){
+                console.log('prior',loop)
+                if(loop){
                     action = 'prior' // 上一首
                     obj.downPrior = true
                 }
@@ -142,7 +150,7 @@ window.onload = function () {
                 action = 'playing' // 播放｜停止
                 obj.downPlay = obj.downStop = true
             } else if (x > 14 + (18 + 10) * 2 && x < 14 + (18 + 10) * 2 + 18) {
-                if(obj.index < obj.totalSongs - 1){
+                if(loop){
                     action = 'next' // 下一首
                     obj.downNext = true
                 }
@@ -162,6 +170,7 @@ window.onload = function () {
             chrome.tabs.create({url:'http://www.scscms.com/'})
         }
         document.onmouseup = function () {
+            obj.downPrior = obj.downPlay = obj.downStop = obj.downNext = false
             bg.operation(action)
             document.onmousemove = document.onmouseup = null
         }
