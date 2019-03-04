@@ -112,10 +112,21 @@ window.onload = function () {
         }
         list.style.display = 'none'
     },false)
+    let signStr
+    setInterval(() => {
+        let str = bg.getCurrentMusicList().length + '-' + bg.obj.init+ '-' +bg.obj.index
+        if (signStr !== str) {
+            signStr = str
+            renderHTML()
+        }
+    }, 1000)
+    function renderHTML() {
+        let html = bg.getCurrentMusicList().map((o, index) => `<li ${bg.obj.init && index === bg.obj.index ? 'class="on"' : ''} data-index="${index}">${index + 1}.${o.name}${o.time ? '<span>' + o.time + '</span>' : ''}<i></i></li>`).join('')
+        list.innerHTML = html || '<li class="empty-list">暂无音乐，请双击添加</li>'
+    }
     document.addEventListener('contextmenu', (e) => {
         e.preventDefault()
-        let html = bg.getCurrentMusicList().map((o,index) => `<li data-index="${index}">${index + 1}.${o.name}${o.time?'<span>'+o.time+'</span>':''}<i></i></li>`).join('')
-        list.innerHTML = html || '<li class="empty-list">暂无音乐，请双击添加</li>'
+        renderHTML()
         list.style.display = 'block'
     }, false)
     document.addEventListener('dblclick', (e) => {

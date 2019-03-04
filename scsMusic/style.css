@@ -65,6 +65,9 @@ html, body {
     color:#666;
     margin-left:5px;
 }
+.list li.on{
+    color: #42ff01;
+}
 .list li.empty-list{
     width: 398px;
     height: 198px;

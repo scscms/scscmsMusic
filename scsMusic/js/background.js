@@ -1,3 +1,47 @@
+// https://github.com/tc39/proposal-promise-finally/blob/master/polyfill.js
+if (typeof Promise.prototype.finally !== 'function') {
+    var speciesConstructor = function (O, defaultConstructor) {
+        if (!O || (typeof O !== 'object' && typeof O !== 'function')) {
+            throw new TypeError('Assertion failed: Type(O) is not Object')
+        }
+        var C = O.constructor
+        if (typeof C === 'undefined') {
+            return defaultConstructor
+        }
+        if (!C || (typeof C !== 'object' && typeof C !== 'function')) {
+            throw new TypeError('O.constructor is not an Object')
+        }
+        var S = typeof Symbol === 'function' && typeof Symbol.species === 'symbol' ? C[Symbol.species] : undefined
+        if (S == null) {
+            return defaultConstructor
+        }
+        if (typeof S === 'function' && S.prototype) {
+            return S
+        }
+        throw new TypeError('no constructor found')
+    }
+
+    var shim = {
+        finally(onFinally) {
+            var promise = this
+            if (typeof promise !== 'object' || promise === null) {
+                throw new TypeError('"this" value is not an Object')
+            }
+            var C = speciesConstructor(promise, Promise) // throws if SpeciesConstructor throws
+            if (typeof onFinally !== 'function') {
+                return Promise.prototype.then.call(promise, onFinally, onFinally)
+            }
+            return Promise.prototype.then.call(
+              promise,
+              x => new C(resolve => resolve(onFinally())).then(() => x),
+              e => new C(resolve => resolve(onFinally())).then(() => {
+                  throw e
+              })
+            )
+        }
+    }
+    Object.defineProperty(Promise.prototype, 'finally', {configurable: true, writable: true, value: shim.finally})
+}
 var W = window
 W.requestFileSystem = W.requestFileSystem || W.webkitRequestFileSystem
 var fileSystem = {
@@ -242,7 +286,6 @@ function playSong(step,index){
             obj.index = Math.floor(Math.random() * maxLength)
         }
     }
-    console.log(pat,'index:',obj.index,obj.downNext,obj.downPrior)
     obj.index >= maxLength && (obj.index = 0)
     obj.index < 0 && (obj.index = maxLength - 1)
     let music = musics[obj.index]
@@ -251,13 +294,12 @@ function playSong(step,index){
     obj.manual = 'ing'
     fileSystem.readerFile(music.fullPath).then(b=>{
         obj.context.decodeAudioData(b).then(buffer => {
-            obj.manual = null
-            updatePlayMenus()
             let duration = parseInt(buffer.duration)
             let pad = t => parseInt(t).toString().padStart(2, '0')
             music.duration = duration
             music.time = `[${pad(duration / 60)}:${pad(duration % 60)}]`
             source.stop && source.stop(0)
+            obj.context.close() // 旧浏览器对创建AudioContext有数量限制
             obj.context = new AudioContext() // 新建对象，否则播放时间不对
             source = obj.context.createBufferSource()
             gainNode = obj.context.createGain()
@@ -272,6 +314,8 @@ function playSong(step,index){
             obj.songDuration = buffer.duration
             source.onended = handlePlayOnEnded
             obj.frequencyArray = new Uint8Array(obj.analyser.frequencyBinCount)
+            obj.manual = null
+            updatePlayMenus()
         },()=>{
             sendNotice('播放音乐出错',`《${music.name}》音乐文件解码失败,已自动删除！`)
             fileSystem.delFile(music.fullPath).then(()=>{
