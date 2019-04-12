@@ -156,7 +156,7 @@ var fileSystem = {
                 let dirReader = dirEntry.createReader()
                 dirReader.readEntries(function (results) {
                     let count = 0
-                    var lists = []
+                    let lists = []
                     results.forEach(o => {
                         fileSystem.listFiles(o.name).then(arr=>{
                             if(o.name === obj.defaultFolder){
@@ -421,6 +421,7 @@ function sendNotice(title,message,fun){
         fun && fun(id)
     })
 }
+
 // 操作播放器
 function operation(action, val) {
     if(obj.manual === 'ing') {

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>scscms music</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body style="width:400px;height:200px">
+<div>
+    <canvas width="400" height="200"></canvas>
+    <ul class="list">
+        <li class="empty-list">暂无音乐</li>
+    </ul>
+</div>
+<img src="img/ico.png" alt="" class="hide" />
+<input class="hide" multiple="multiple" accept="audio/mp3" type="file" />
+<script type="text/javascript">
+    let obj = {
+        manual: null, // 手动操作
+        music: [], // 歌曲列表
+        index: 0, // 当前播放序号
+        pattern: ['loop', 'ordinal', 'single', 'random'], // 播放模式
+        serial: 0, // 播放模式序号
+        init: false, // 是否已经初始化
+        volume: 0.5, // 音量 [0-100]
+        mute: false, // 静音
+        downPrior:false,
+        downNext:false,
+        downPlay:false,
+        downStop:false,
+        capYArray:new Array(1024).fill(0)//帽子
+    }
+    let ctx,img,list,gradient,hasDraw // 是否已经在绘画
+    function roundedRect(x, y, width, height, radius) {
+        ctx.beginPath()
+        ctx.moveTo(x, y + radius)
+        ctx.lineTo(x, y + height - radius)
+        ctx.quadraticCurveTo(x, y + height, x + radius, y + height)
+        ctx.lineTo(x + width - radius, y + height)
+        ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - radius)
+        ctx.lineTo(x + width, y + radius)
+        ctx.quadraticCurveTo(x + width, y, x + width - radius, y)
+        ctx.lineTo(x + radius, y)
+        ctx.quadraticCurveTo(x, y, x, y + radius)
+        ctx.stroke()
+    }
+    // 画线
+    function drawLine(x, y, X, Y, color) {
+        ctx.beginPath()
+        ctx.moveTo(x, y)
+        ctx.lineTo(X, Y)
+        ctx.strokeStyle = color
+        ctx.stroke()
+    }
+    // 截取歌曲名
+    function getNameByteLen(name) {
+        let len = 30
+        let str = ''
+        for (let i = 0; i < name.length; i++) {
+            len -= /[^\x00-\xff]/.test(name[i]) ? 2 : 1
+            if(len < 0){
+                str = name.slice(0,i)
+                break
+            }
+        }
+        return len < 0 ? str : name
+    }
+
+    function beforeDraw() {
+        if (!hasDraw) {
+            if (obj.init) {
+                draw()
+                hasDraw = true
+            } else {
+                setTimeout(beforeDraw, 1000)
+            }
+        }
+    }
+    function draw() {
+        ctx.clearRect(0, 0, 400, 200) // 清空画布
+        analyser.getByteFrequencyData(frequencyArray)
+        for (let i = frequencyArray.length; i--;) {
+            obj.capYArray[i] = frequencyArray[i*10] < obj.capYArray[i] ? obj.capYArray[i] - 1 : frequencyArray[i*10]
+            ctx.fillStyle = '#fff'
+            ctx.fillRect(i*6, 170 - obj.capYArray[i], 4, 2)
+            ctx.fillStyle = gradient
+            let y = 170 - frequencyArray[i*10]
+            ctx.fillRect(i*6, Math.max(0, y), 4, 170)
+        }
+        // 画控制台背景
+        let clg = ctx.createLinearGradient(0, 168, 0, 200)
+        clg.addColorStop(0, '#36342b')
+        clg.addColorStop(1, '#232018')
+        ctx.shadowBlur = 6
+        ctx.shadowColor = 'rgba(0,0,0,0.4)'
+        ctx.fillStyle = clg
+        ctx.fillRect(0, 168, 400, 200)
+        drawLine(0, 167.5, 400, 167.5, '#003300')
+        drawLine(0, 168.5, 400, 168.5, '#51514a')
+        let pattern = obj.pattern[obj.serial]
+        let y = obj.downPrior || (pattern === 'ordinal' && obj.index === 0) ? 0 : 18
+        ctx.drawImage(img, 0, y, 18, 18, 14, 175, 18, 18) // 上一首
+        y = context.state !== 'suspended' ? (obj.downStop ? 234 : 54) : (obj.downPlay ? 216 : 36)
+        ctx.drawImage(img, 0, y, 18, 18, 14 + 18 + 10, 175, 18, 18) // 播放｜停止
+        y = obj.downNext || (pattern === 'ordinal' && obj.index === obj.music.length - 1) ? 72 : 90
+        ctx.drawImage(img, 0, y, 18, 18, 14 + (18 + 10) * 2, 175, 18, 18) // 下一首
+        y = {loop: 108, single: 126, random: 144, ordinal: 162}[pattern]
+        ctx.drawImage(img, 0, y, 18, 18, 14 + (18 + 10) * 3, 175, 18, 18) // 循环
+        y = obj.mute ? 198 : 180
+        ctx.drawImage(img, 0, y, 18, 18, 14 + (18 + 10) * 4, 175, 18, 18) // 静音
+        // 音量
+        ctx.strokeStyle = '#626262'
+        ctx.lineWidth = 1
+        roundedRect(150, 182, 42, 5, 2)
+        ctx.fillStyle = '#33ff00'
+        ctx.fillRect(151, 183, Math.floor(obj.volume * 40), 3)
+        // 歌曲名称
+        ctx.font = '12px sans-serif'
+        ctx.align = 'left'
+        ctx.fillText(getNameByteLen(obj.music[obj.index].name), 220, 188, 170)
+        requestAnimationFrame(draw)
+    }
+
+    window.onload = function () {
+        // let bg = chrome.extension.getBackgroundPage();
+        // 格式化秒数
+        function formatSeconds(s) {
+            let second = parseInt(s)
+            let pad = t => parseInt(t).toString().padStart(2, '0')
+            return `[${pad(second / 60)}:${pad(second % 60)}]`
+        }
+        let input = document.querySelector('input')
+        list = document.querySelector('.list')
+        list.addEventListener('click', (e) => {
+            let tag = e.target
+            if(tag.tagName==='LI'){
+                playSong(0,parseInt(tag.dataset.index))
+                obj.manual = 'action'
+                list.style.display = 'none'
+            }else if(tag.tagName === 'I'){
+                if(confirm('确定要删除此音乐？')){
+                    let i = parseInt(tag.parentNode.dataset.index)
+                    bufferArray.splice(i,1)
+                    obj.music.splice(i,1)
+                    if(i === obj.index){
+                        playSong(1)
+                    }
+                }
+            }
+        },false)
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault()
+            let html = obj.music.map((o,index) => `<li data-index="${index}">${index + 1}.${o.name.replace(/\.\w+$/,'')} <span>${formatSeconds(o.duration)}</span></li>`).join('')
+            list.innerHTML = html || '<li class="empty-list">暂无音乐</li>'
+            list.style.display = 'block'
+        }, false)
+        document.addEventListener('dblclick', () => input.click(), false)
+        input.addEventListener('change', e => {
+            decodeData(Array.from(e.target.files))
+        }, false)
+        let canvas = document.querySelector('canvas')
+        let div = document.querySelector('div')
+        img = document.querySelector('img')
+        ctx = canvas.getContext('2d')
+        ctx.font = '18px sans-serif'
+        ctx.fillStyle = '#006600'
+        ctx.align = 'center'
+        ctx.fillText('双击添加歌曲', 100, 100)
+        gradient = ctx.createLinearGradient(0, 0, 0, 170)
+        gradient.addColorStop(0, '#ff6600')
+        gradient.addColorStop(0.3, '#fe9901')
+        gradient.addColorStop(0.7, '#feff00')
+        gradient.addColorStop(1, '#29ff01')
+        beforeDraw()
+        div.addEventListener('mousedown', function (e) {
+            let x = e.pageX
+            let y = e.pageY
+            let action
+            if (y > 175 && y < 175 + 18) {
+                if (x > 14 && x < 14 + 18) {
+                    action = 'prior' // 上一首
+                    obj.downPrior = true
+                } else if (x > 14 + 18 + 10 && x < 14 + 18 + 10 + 18) {
+                    action = 'playing' // 播放｜停止
+                    obj.downPlay = obj.downStop = true
+                } else if (x > 14 + (18 + 10) * 2 && x < 14 + (18 + 10) * 2 + 18) {
+                    action = 'next' // 下一首
+                    obj.downNext = true
+                } else if (x > 14 + (18 + 10) * 3 && x < 14 + (18 + 10) * 3 + 18) {
+                    action = 'serial' // 循环
+                } else if (x > 14 + (18 + 10) * 4 && x < 14 + (18 + 10) * 4 + 18) {
+                    action = 'mute' // 静音
+                }
+            }
+            if (x > 150 && x < 150 + 42 && y > 182 && y < 182 + 5) {
+                setVolume(x - 150)
+                document.onmousemove = function (e) {
+                    setVolume(Math.max(0, e.pageX - 150))
+                }
+            }
+            document.onmouseup = function () {
+                obj.manual = action
+                switch (action) {
+                    case 'prior':
+                        obj.downPrior = false
+                        playSong(-1)
+                        break
+                    case 'playing':
+                        console.log(context.state)
+                        context.state === 'running'?context.suspend():context.resume()
+                        obj.downPlay = obj.downStop = false
+                        break
+                    case 'next':
+                        playSong(1)
+                        obj.downNext = false
+                        break
+                    case 'serial':
+                        obj.serial = ++obj.serial % 4
+                        break
+                    case 'mute':
+                        (obj.mute = !obj.mute)?analyser.disconnect(gainNode):
+                          analyser.connect(gainNode)
+                        break
+                    default:
+                }
+                document.onmousemove = document.onmouseup = null
+            }
+        }, false)
+    }
+
+    // bg函数
+    const context = new AudioContext()
+    let gainNode
+    let analyser
+    let source
+    let bufferArray = [];//歌曲缓存数组
+    let frequencyArray = [];//采样频率缓冲数组
+    let songArray
+    function decodeData(arr) {
+        Array.isArray(arr) && (songArray = arr)
+        if (songArray.length) {
+            const file = songArray.shift()
+            const fileReader = new FileReader()
+            fileReader.onloadend = function (e) {
+                const fileContent = e.target.result
+                context.decodeAudioData(fileContent).then(function (buffer) {
+                    bufferArray.push(buffer)
+                    obj.music.push({name:file.name,duration:buffer.duration})
+                    if (bufferArray.length === 1) {
+                        playSong(0,0) // 开始播放第一首歌曲
+                        obj.init = true
+                    }
+                    decodeData()
+                })
+            }
+            fileReader.onerror = function () {
+                decodeData()
+            }
+            fileReader.readAsArrayBuffer(file)
+        }
+    }
+    // 设置音量
+    function setVolume(width) {
+        obj.volume = Math.min(40, width) / 40
+        gainNode.gain.value = obj.volume
+    }
+    //指定序号播放歌曲
+    function playSong(step,index){
+        // 处理循环问题
+        let len = bufferArray.length
+        let pat = obj.pattern[obj.serial]
+        obj.index += step
+        if(Number.isInteger(index)){
+            obj.index = index
+        }else if(pat === 'loop'){
+            obj.index >= len && (obj.index = 0)
+            obj.index < 0 && (obj.index = len - 1)
+        }else if(pat === 'ordinal'){
+            if(obj.index >= len||obj.index ===0){
+                return
+            }
+        }else if(pat === 'random'){
+            obj.index = Math.floor(Math.random() * len)
+        }
+        obj.capYArray.fill(0)//帽子
+        context.state === 'suspended' && context.resume()
+        source && source.stop(0)//先停止之前歌曲
+        source = context.createBufferSource()
+        gainNode = context.createGain()
+        gainNode.gain.value = obj.volume
+        analyser = context.createAnalyser()//创建获取频谱能量值的分析器
+        source.buffer = bufferArray[obj.index]//缓冲数据
+        source.connect(analyser)
+        analyser.connect(gainNode)
+        gainNode.connect(context.destination)
+        source.start(0)
+        source.onended = function () {
+            if(!obj.manual){
+                // 手动点击上下一首，也会触发onended，所以要排除
+                playSong(0)//自动下一曲
+            }
+            obj.manual = null
+        }
+        frequencyArray = new Uint8Array(analyser.frequencyBinCount)
+    }
+</script>
+</body>
+</html>

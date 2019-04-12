@@ -1,0 +1,161 @@
+* {
+    box-sizing: border-box;
+    margin: 0;padding: 0;
+    list-style: none;
+    user-select:none
+}
+.clearFix:after { content: ''; display: block; clear: both; visibility: hidden; line-height: 0; height: 0; }
+html, body {
+    font-family: 'Microsoft Yahei',sans-serif;
+    overflow: hidden;
+    font-size:12px;
+    padding:0;
+    margin:0;
+    background-color: #272822;
+}
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background: transparent
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 16px;
+    background-color: rgba(215, 215, 215, 0.6)
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(195, 195, 195, 0.6)
+}
+::-webkit-scrollbar-thumb:active {
+    background-color: rgba(175, 175, 175, 0.6)
+}
+::-webkit-scrollbar-button {
+    background: transparent;
+    height: 0;
+}
+.hide {
+    position: absolute;
+    left: -1000px
+}
+.list{
+    position:absolute;
+    display: none;
+    left:0;
+    top:0;
+    width:400px;
+    height:200px;
+    border-top:1px solid #2f3844;
+    border-left:1px solid #2f3844;
+    background-color: #272822;
+    overflow: auto;
+}
+.list li{
+    position: relative;
+    width:50%;
+    float:left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height:27px;
+    text-indent:12px;
+    border-right:1px solid #2f3844;
+    border-bottom:1px solid #2f3844;
+    color: #ebebeb;
+}
+.list li span{
+    color:#666;
+    margin-left:5px;
+}
+.list li.on{
+    color: #42ff01;
+}
+.list li.empty-list{
+    width: 398px;
+    height: 198px;
+    text-align: center;
+    font-size: 18px;
+    line-height: 190px;
+    color: #006600;
+    border:none
+}
+.list li:not([class]):hover{
+    background-color: #2f3844;
+}
+
+.list li i {
+    cursor:pointer;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 0;
+    top: 5px;
+}
+
+.list li i::before, .list li i::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    margin-left: -50%;
+    width: 15px;
+    height: 1px;
+    background-color: #888;
+    transform: rotate(45deg);
+}
+.list li i::after {
+    transform: rotate(-45deg);
+}
+.list li i:hover::before, .list li i:hover::after{background-color:red}
+.options{
+    width:400px;
+    height:200px;
+    color: #888;
+}
+.options .list{
+    display: block;
+    width:400px;
+    height:170px;
+}
+.options p{
+    margin:0 5px;
+    font-size:12px;
+    text-indent:24px;
+}
+.options div{
+    position: fixed;
+    width:98%;
+    bottom:4px;
+    right:4px;
+    text-align: right;
+}
+.options div input{
+    padding:2px;
+}
+.options div .dell{
+    color:red;
+    float:left;
+    display: none;
+}
+.buildList{
+    margin-left:3px
+}
+.folder{width:100px;}
+.play_ico{
+    width:20px;
+    height:15px;
+    margin-right:3px;
+    vertical-align: center;
+}
+.options .error{
+    position: absolute;
+    display: none;
+    top:2px;
+    left:0;
+    text-align: center;
+    width:100%;
+    z-index: 3;
+}
+.options .error p{
+    display: inline;
+    color:red;
+    padding: 3px;
+    background-color: #fff;
+}

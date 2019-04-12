@@ -102,15 +102,16 @@ window.onload = function () {
     list = document.querySelector('.list')
     list.addEventListener('click', (e) => {
         let tag = e.target
+        e.stopPropagation()
         if(tag.tagName==='LI'){
             obj.manual = 'clickLI'
             bg.playSong(0,parseInt(tag.dataset.index))
+            list.style.display = 'none'
         }else if(tag.tagName === 'I'){
             if(confirm('确定要删除此音乐？')){
                 bg.operation('remove', parseInt(tag.parentNode.dataset.index))
             }
         }
-        list.style.display = 'none'
     },false)
     let signStr
     setInterval(() => {
@@ -145,7 +146,7 @@ window.onload = function () {
     gradient.addColorStop(0.5, '#feff00')
     gradient.addColorStop(1, '#29ff01')
     draw()
-    div.addEventListener('mousedown', function (e) {
+    div.addEventListener('click', function (e) {
         let x = e.pageX
         let y = e.pageY
         let action
