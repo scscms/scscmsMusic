@@ -146,11 +146,12 @@ window.onload = function () {
     gradient.addColorStop(0.5, '#feff00')
     gradient.addColorStop(1, '#29ff01')
     draw()
-    div.addEventListener('click', function (e) {
+    let action
+    div.addEventListener('mousedown', function (e) {
         let x = e.pageX
         let y = e.pageY
-        let action
         let loop = obj.totalSongs > 0
+        action = null
         if (y > 175 && y < 175 + 18) {
             if (x > 14 && x < 14 + 18) {
                 console.log('prior',loop)
@@ -174,17 +175,13 @@ window.onload = function () {
         }
         if (x > 150 && x < 150 + 42 && y > 182 && y < 182 + 5) {
             bg.operation('setVolume',x - 150)
-            document.onmousemove = function (e) {
-                bg.operation('setVolume',Math.max(0, e.pageX - 150))
-            }
         }
         if (x > 365 && y > 177) {
             chrome.tabs.create({url:'http://www.scscms.com/'})
         }
-        document.onmouseup = function () {
-            obj.downPrior = obj.downPlay = obj.downStop = obj.downNext = false
-            bg.operation(action)
-            document.onmousemove = document.onmouseup = null
-        }
+    }, false)
+    div.addEventListener('mouseup', function () {
+        obj.downPrior = obj.downPlay = obj.downStop = obj.downNext = false
+        action && bg.operation(action)
     }, false)
 }

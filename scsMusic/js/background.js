@@ -217,7 +217,9 @@ var obj = {
     downStop: false,
     capYArray: new Array(1024).fill(0), //帽子
     analyser: null,
-    frequencyArray: [] //采样频率缓冲数组
+    frequencyArray: [], //采样频率缓冲数组,
+    storageTime : performance.now(),
+    storageSet : 0
 }
 let gainNode // 音量控制器
 var source = {} // 音频源
@@ -249,10 +251,19 @@ function startInitialize() {
     })
 }
 // 存储缓存
-function setStorage(fun){
-    fun = fun||function(){}
-    let {defaultFolder,volume,serial,autoPlay,songPush} = obj
-    chrome.storage.sync.set({defaultFolder,volume,serial,autoPlay,songPush}, fun)
+// chrome40及以后，每秒至多执行storage两次操作
+
+function setStorage(fun) {
+    let t = performance.now()
+    if (t - obj.storageTime > 500) {
+        obj.storageTime = t
+        fun = fun || function () {
+        }
+        let {defaultFolder, volume, serial, autoPlay, songPush} = obj
+        chrome.storage.sync.set({defaultFolder, volume, serial, autoPlay, songPush}, fun)
+    } else {
+        obj.storageSet = setTimeout(setStorage, 500, fun)
+    }
 }
 // 指定序号播放歌曲
 function playSong(step,index){
