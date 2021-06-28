@@ -1,0 +1,27 @@
+{
+  "chrome_extension_name": {
+    "message": "Прихватљиви језици"
+  },
+  "chrome_extension_description": {
+    "message": "Језици које прегледач прихвата"
+  },
+  "click_here": {
+    "message": "Кликните да излистате дозвољене језике."
+  },
+  "browser_action_title": {
+    "message": "Haz click aquí"
+  },
+  "chrome_accept_languages": {
+    "message": "$CHROME$ прихвата $languages$ језике.",
+    "placeholders": {
+      "chrome": {
+        "content": "Chrome",
+        "example": "Chrome"
+      },
+      "languages": {
+        "content": "$1",
+        "example": "en-US,sr,de"
+      }
+    }
+  }
+}

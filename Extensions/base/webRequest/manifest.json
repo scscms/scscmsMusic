@@ -1,0 +1,15 @@
+{
+  "name": "webRequest网络请求",
+  "short_name": "webRequest",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "description": "webRequest网络请求",
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  }
+}

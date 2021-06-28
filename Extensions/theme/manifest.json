@@ -1,0 +1,29 @@
+{
+   "manifest_version": 2,
+   "version": "4",
+   "name": "名称",
+   "theme": {
+      "colors": {
+         "bookmark_text": [ 255, 255, 255 ],//书签文本
+         "frame": [ 0, 0, 0, 0 ], // 主框架颜色
+         "button_background": [ 0, 0, 0, 0 ], //右上角按钮
+         "ntp_background": [ 255, 255, 255 ], //空白页背景
+         "ntp_text": [ 255, 255, 255 ], //空白页文本
+         "tab_background_text": [ 64, 64, 64 ],//非激活tab文本
+         "tab_text": [ 255, 255, 255 ], //当前tab文本
+         "toolbar": [ 0, 0, 0 ] //左下角工具栏
+      },
+      "images": {
+         "theme_frame": "images/theme_frame.png", // 主框架背景
+         "theme_ntp_background": "images/theme_ntp_background.png", // 页面主体
+         "theme_toolbar": "images/theme_toolbar.png" // 工具栏
+      },
+      "properties": {
+         "ntp_background_alignment": "bottom", //对齐方式
+         "ntp_background_repeat": "no-repeat" //平铺方式repeatX repeatY repeatXY
+      },
+      "tints": {
+         "buttons": [ 0, 0, 1 ] // 色调
+      }
+   }
+}

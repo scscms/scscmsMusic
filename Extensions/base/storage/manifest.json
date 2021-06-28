@@ -1,0 +1,15 @@
+{
+    "name": "储存数据",
+    "version": "1.0",
+    "description": "储存数据示例",
+    "permissions": ["tabs", "storage"],
+    "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+    },
+    "browser_action": {
+      "default_title": "储存数据 popup",
+      "default_popup": "popup.html"
+    },
+    "manifest_version": 2
+  }

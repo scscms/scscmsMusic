@@ -1,0 +1,38 @@
+{
+  "name": "commands 快捷键",
+  "short_name": "commands",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "快捷键"
+  },
+  "options_ui": {
+    "page": "options.html"
+  },
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
+      "description": "open action"
+    },
+    "play": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F",
+        "mac": "Command+Shift+F"
+      },
+      "description": "播放"
+    },
+    "next-play": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Q"
+      },
+      "description": "下一首"
+    }
+  }
+}

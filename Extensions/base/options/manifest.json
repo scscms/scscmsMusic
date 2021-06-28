@@ -1,0 +1,20 @@
+{
+  "name": "面对技术怎么选？",
+  "version": "1.0.2",
+  "version_name": "【1.0.2 options】",
+  "manifest_version": 2,
+  "description": "扩展程序options",
+  "browser_action": {
+    "default_icon": "img/icons16.png",
+    "default_popup": "options.html",
+    "default_title": "面对技术怎么选"
+  },
+  "options_ui": {
+    "page": "options.html"
+  },
+  "icons": {
+    "128": "img/icons128.png",
+    "48": "img/icons48.png",
+    "16": "img/icons16.png"
+  }
+}

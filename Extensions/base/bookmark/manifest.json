@@ -1,0 +1,12 @@
+{
+  "name": "bookmark 书签管理",
+  "short_name": "bookmark",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "description": "bookmark",
+  "permissions": ["bookmarks"],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "bookmark"
+  }
+}

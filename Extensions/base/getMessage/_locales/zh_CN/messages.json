@@ -1,0 +1,27 @@
+{
+  "chrome_extension_name": {
+    "message": "选择语言"
+  },
+  "chrome_extension_description": {
+    "message": "返回浏览器支持的语言"
+  },
+  "click_here": {
+    "message": "左键单击可列出语言"
+  },
+  "browser_action_title": {
+    "message": "点击"
+  },
+  "chrome_accept_languages": {
+    "message": "$CHROME$ 支持 $languages$ 语言",
+    "placeholders": {
+      "chrome": {
+        "content": "谷歌",
+        "example": "谷歌"
+      },
+      "languages": {
+        "content": "$1",
+        "example": "en-US,sr,de"
+      }
+    }
+  }
+}

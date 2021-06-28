@@ -1,0 +1,62 @@
+{
+  // Required
+  "manifest_version": 2, //清单文件版本，chrome17以下支持版本1；chrome88以上支持版本3；chrome18以上支持版本2
+  "name": "插件名称",  //插件名称 45个字符以内 插件主要标识之一
+  "short_name": "scsMusic", //可选 插件短名 12字符以内
+  "version": "1.0.7", //插件版本 每次在应用商店里更新必须更换不同版本号
+  "version_name": "1.0 beta", //可选 版本名称
+
+  // Recommended
+  "page_action": {}, // 与browser_action 二选一
+  "browser_action": {
+    "default_icon": "img/icons16.png",
+    "default_popup": "popup.html",
+    "default_title": "SCSCMS音乐播放器" //鼠标经过提示标题
+  }, // version 2 版本使用
+  "action": {
+    "default_icon": {
+      "16": "images/icon16.png",
+      "24": "images/icon24.png",
+      "32": "images/icon32.png"
+    },
+    "default_title": "鼠标经过提示标题",
+    "default_popup": "popup.html"
+  }, // version 3 版本使用 定义插件在工具栏的状态，还可使用脚本动态管理
+  "description": "扩展介绍", //132个字符以内的简介
+  "default_locale": "cn", // 可选 默认语言 多语言版本必须指定
+  "icons": {
+    "128": "img/icons128.png",
+    "48": "img/icons48.png",
+    "16": "img/icons16.png", // 右键菜单图标
+  },// 图标 建议使用 128商店使用 48应用管理使用 16工具栏使用
+
+  // Optional
+  "author": "作者",
+  "homepage_url": "https://github.com/scscms/", // 主页
+  "offline_enabled": true,//离线运行
+  "background": {
+    // "page": "background.html",
+    "scripts": ["background.js"]
+  },// 常驻的后台JS或后台页面 service_worker
+  "options_ui": {
+    "chrome_style": true,
+    "page": "options.html"
+  },// 配置页面
+  "content_scripts": [ {
+    //matches、exclude_matches、css、js、run_at、all_frames、include_globs和exclude_globs属性
+    "all_frames": true,
+    "js": [ "js/content-script.js" ],
+    "matches": [ "http://www.scscms.com/*" ],
+    "run_at": "document_start" //document_start  document_end  document_idle（默认）
+  } ],
+  "key": "唯一标识值",
+  "permissions": [
+    "activeTab",
+    "contextMenus",
+    "notifications",
+    "webRequest",
+    "tts",
+    "storage"
+  ], //申请的权限
+  "web_accessible_resources": [ "dist/*", "dist/**/*" ] //允许扩展外的页面访问的扩展内指定的资源(比如桌面通知图标)
+}

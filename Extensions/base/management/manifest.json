@@ -1,0 +1,10 @@
+{
+  "manifest_version": 2,
+  "name": "管理扩展程序",
+  "version": "1.0",
+  "description": "管理扩展程序",
+  "permissions": ["management"],
+  "browser_action":{
+    "default_popup": "popup.html"
+  }
+}

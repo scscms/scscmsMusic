@@ -1,0 +1,17 @@
+{
+    "app": {
+        "background": {
+            "scripts": ["background.js"]
+        }
+    },
+    "manifest_version": 2,
+    "name": "desktopCapture",
+    "version": "1.0",
+    "description": "desktopCapture",
+    "icons": {
+        "128": "icon.png"
+    },
+    "permissions": [
+        "desktopCapture"
+    ]
+}

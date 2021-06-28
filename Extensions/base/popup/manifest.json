@@ -1,0 +1,17 @@
+{
+  "name": "Hello, World!",
+  "short_name": "Hello",
+  "version": "1.0.2",
+  "version_name": "【1.0.2 test】",
+  "manifest_version": 2,
+  "description": "扩展程序第三版 添加了popup.html",
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "鼠标经过提示标题"
+  },
+  "icons": {
+    "128": "img/icons128.png",
+    "48": "img/icons48.png",
+    "16": "img/icons16.png"
+  }
+}

@@ -1,0 +1,49 @@
+<html>
+    <head>
+      <title>Water Popup</title>
+      <style>
+        .wrapper{
+          width: 750px;
+          height: 300px;
+        }
+        .btn {
+          border: 1px solid #ddd;
+          border-radius: 3px;
+          cursor: pointer;
+          font-size: .9rem;
+          padding: 0 2rem;
+          margin: .2rem;
+          height: 3rem;
+        }
+        .btn:active{
+          color:red;
+          font-weight: bold;
+        }
+        .form-control{
+          width:200px;
+          height:80px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="wrapper container">
+        <div class="col-md-12">
+          <button class="btn btn-primary" id="btn1">async set</button>
+          <button class="btn btn-primary" id="btn2">async get</button>
+          <button class="btn btn-primary" id="btn3">async set get</button>
+        </div>
+        <div class="col-md-12">
+          <textarea class="form-control" id="textarea" placeholder="default value ...text"></textarea>
+        </div>
+        <div class="col-md-6">
+          <button class="btn btn-primary" id="btn4">local save text</button>
+        </div>
+        <div class="col-md-12">
+          <button class="btn btn-primary" id="btn5">local get text</button>
+          <button class="btn btn-primary" id="btn6">remove</button>
+          <button class="btn btn-primary" id="btn7">clear</button>
+        </div>
+      </div>
+      <script src="popup.js"></script>
+    </body>
+  </html>

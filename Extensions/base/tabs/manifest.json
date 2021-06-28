@@ -1,0 +1,16 @@
+{
+  "name": "tabs 标签管理",
+  "short_name": "tabs",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "description": "tabs 标签管理",
+  "permissions": ["tabs", "activeTab", "<all_urls>","contextMenus"],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "bookmark"
+  }
+}

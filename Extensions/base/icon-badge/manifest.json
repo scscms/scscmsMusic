@@ -1,0 +1,19 @@
+{
+    "manifest_version": 2,
+    "name": "标题和 badge",
+    "version": "1.0",
+    "description": "标题和 badge",
+    "permissions": ["tabs"],
+    "browser_action": {
+        "default_icon": {
+            "19": "images/icon19_0.png",
+            "38": "images/icon38_0.png"
+        },
+        "default_title": "标题和 badge"
+    },
+    "background": {
+        "scripts": [
+            "js/background.js"
+        ]
+    }
+}

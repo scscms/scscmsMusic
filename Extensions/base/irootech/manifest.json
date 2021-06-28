@@ -1,0 +1,12 @@
+{
+  "manifest_version": 2,
+  "name": "永远点不到的登录按钮",
+  "version": "1.0",
+  "description": "永远点不到的登录按钮",
+  "content_scripts": [
+    {
+      "matches": ["http://workpro.irootech.com/scene/login/*"],
+      "js": ["js/cannot_touch.js"]
+    }
+  ]
+}

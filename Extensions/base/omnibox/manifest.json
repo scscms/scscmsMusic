@@ -1,0 +1,22 @@
+{
+    "manifest_version": 2,
+    "name": "Omnibox",
+    "version": "1.0",
+    "omnibox": { "keyword" : "music" },
+    "description": "Omnibox 测试",
+    "browser_action": {
+        "default_icon": {
+            "16": "images/16.png",
+            "32": "images/32.png"
+        },
+        "default_title": "Omnibox"
+    },
+    "icons": {
+        "16": "images/16.png"
+    },
+    "background": {
+        "scripts": [
+            "js/background.js"
+        ]
+    }
+}
